@@ -204,7 +204,6 @@ function openAI(openai_search, res) {
     ],
     temperature: 0.4,
     max_tokens: 200,
-    type: "json_object",
   };
 
   const recs = https.request(endpoint, options, model);
@@ -215,15 +214,29 @@ function openAI(openai_search, res) {
 }
 
 function parse_openai(body, res) {
+  console.log(body);
   const openai = JSON.parse(body);
   console.log(openai);
-  const content = openai.choices[0].message.content;
+  // const content = openai.choices[0].message.content;
 
-  try {
-    const jsonResponse = JSON.parse(content);
-    console.log(jsonResponse);
-  } catch (error) {
-    console.error("Failed to parse JSON:", error);
-    console.log("Raw content:", content);
-  }
+  //   const jsonResponse = JSON.parse(content);
+  //   console.log(jsonResponse);
+  // } catch (error) {
+  //   console.error("Failed to parse JSON:", error);
+  //   console.log("Raw content:", content);
+  // }
+}
+
+function add_song(res, playlist_id) {
+  const endpoint = `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`;
+  const add_playlist = https.get(endpoint, {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+      "Content-Type": `application/x-www-form-urlencoded`,
+    },
+  });
+  let body = { uris: ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh"], position: 0 };
+  add_playlist.on("response", (stream) => {
+    process_stream(stream, access_token, res);
+  });
 }
